@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>CodePen - Simple Reminders App</title>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1">
+
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-kerning: auto;
+            font-family: 'Open Sans', 'Source Sans Pro', Roboto, 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', 'Myriad Pro', 'Segoe UI', Myriad, Helvetica, 'Lucida Grande', 'DejaVu Sans Condensed', 'Liberation Sans', 'Nimbus Sans L', Tahoma, Geneva, Arial, sans-serif;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+            cursor: default;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: rgb(2, 112, 11);
+        }
+
+        h1 {
+            margin: 15px 0;
+            line-height: 1.2;
+            color: rgb(183, 230, 17);
+            padding: 0 15px;
+        }
+
+        section {
+            padding: 0 15px 0 15px;
+            position: relative;
+        }
+
+        section input[type=text] {
+            margin: 0 0 15px 0;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #fc0;
+            color: black;
+            border: 1px solid #e90;
+            border-radius: 1px;
+            padding: 5px;
+            font-size: 14pt;
+            font-weight: normal;
+            outline: none;
+            float: left;
+            width: calc(100% - 50px);
+            cursor: pointer;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            -o-user-select: text;
+            user-select: text;
+        }
+
+        section input[type=button] {
+            margin: 0 0 15px 0;
+            -webkit-appearance: none;
+            appearance: none;
+            border: 1px solid #e90;
+            background: #fc0;
+            color: #e90;
+            border-radius: 1px;
+            padding: 5px;
+            font-size: 19pt;
+            line-height: 1;
+            font-weight: bold;
+            outline: none;
+            width: 35px;
+            float: right;
+            cursor: pointer;
+        }
+
+        #enter input[type=text] {
+            background: #fe5;
+        }
+
+        #enter input[type=button] {
+            background: #e90;
+            color: #fc0;
+            border-color: #e90;
+        }
+    </style>
+
+    <script>
+        window.console = window.console || function (t) { };
+    </script>
+
+
+
+    <script>
+        if (document.location.search.match(/type=embed/gi)) {
+            window.parent.postMessage("resize", "*");
+        }
+    </script>
+
+
+</head>
+
+<body translate="no">
+    <h1>Reminders</h1>
+    <section id=enter>
+        <input type=text autofocus>
+        <input type=button value=+ onClick=reminders.create(input.value)>
+    </section>
+    <script <script id="rendered-js">
+        var input = document.querySelectorAll('#enter input[type=text]')[0],
+            entries = {},
+            completed = {},
+            reminders = {
+                create: function (text) {
+                    if (text != '') {
+                        var entry = Date.now();
+                        if (localStorage.entries) {
+                            entries = JSON.parse(localStorage.entries);
+                        }
+                        entries[entry] = text;
+                        localStorage.entries = JSON.stringify(entries);
+                        input.value = '';
+                        reminders.display('entries');
+                    }
+                    input.focus();
+                },
+                display: function (list) {
+                    var list = JSON.parse(localStorage[list]);
+                    for (var entry in list) {
+                        var box = document.createElement('section'),
+                            task = document.createElement('input'),
+                            exit = document.createElement('input');
+                        task.type = 'text';
+                        task.setAttribute('onblur', 'reminders.edit(this.value, this.parentNode.id)');
+                        task.value = list[entry];
+                        exit.type = 'button';
+                        exit.setAttribute('onclick', 'reminders.complete(this.parentNode.id)');
+                        exit.value = '×';
+                        box.id = entry;
+                        box.appendChild(task);
+                        box.appendChild(exit);
+                        if (!document.getElementById(entry)) {
+                            document.getElementsByTagName('body')[0].insertBefore(box, document.getElementById('enter'));
+                        }
+                    }
+                },
+                edit: function (text, id) {
+                    entries = JSON.parse(localStorage.entries);
+                    entries[id] = text;
+                    localStorage.entries = JSON.stringify(entries);
+                },
+                complete: function (id) {
+                    entries = JSON.parse(localStorage.entries);
+                    if (localStorage.completed) {
+                        completed = JSON.parse(localStorage.completed);
+                    }
+                    completed[id] = entries[id];
+                    delete entries[id];
+                    localStorage.completed = JSON.stringify(completed);
+                    localStorage.entries = JSON.stringify(entries);
+                    reminders.display('entries');
+                    document.getElementById(id).remove();
+                }
+            };
+
+        document.onkeydown = function (e) {
+            e = e || window.event;
+            var charCode = typeof e.which == "number" ? e.which : e.keyCode;
+            if (charCode == 13) { reminders.create(input.value); }
+        };
+        reminders.display('entries');
+    </script>
+
+
+
+</body>
+
+</html>
